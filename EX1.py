@@ -1,14 +1,38 @@
 class Student:
-    def __init__(self, name, surname, gender, age):
+    def __init__(self, name, surname, gender):
         self.name = name
         self.surname = surname
         self.gender = gender
-        self.age = age
         self.finished_courses = []
         self.courses_in_progress = []
         self.grades = {}
-    
-    def rate_lecture(self, lecturer, grade, course):
+    def calculate_average_grade(self):
+        total_grades = []
+        for grades in self.grades.values():
+            total_grades.extend(grades)
+        
+        if len(total_grades) > 0:
+            average_grade = sum(total_grades) / len(total_grades)
+            return average_grade
+        else:
+            return 0
+
+    def __str__(self):
+        average_grade = self.calculate_average_grade()
+        courses_in_progress = ', '.join(self.courses_in_progress)
+        finished_courses = ', '.join(self.finished_courses)
+        
+        return f"Имя: {self.name}\nФамилия: {self.surname}\nСредняя оценка: {average_grade}\nКурсы в процессе: {courses_in_progress}\nЗавершенные курсы: {finished_courses}"
+
+    def rate_student(self, lecturer, grade, course):
+        if course in lecturer.courses_attached and course in self.courses_in_progress:
+            if course in lecturer.grades:
+                lecturer.grades[course].append(grade)
+            else:
+                lecturer.grades[course] = [grade]
+        else:
+            return f"'Ошибка' {average_grade}"    
+    def rate_student(self, lecturer, grade, course):
         if course in lecturer.courses_attached and course in self.courses_in_progress:
             if course in lecturer.grades:
                 lecturer.grades[course].append(grade)
@@ -16,9 +40,6 @@ class Student:
                 lecturer.grades[course] = [grade]
         else:
             return 'Ошибка'
-    
-    def __str__(self):
-        return f"Имя: {self.name}\nФамилия: {self.surname}"
 
 
 class Mentor:
@@ -47,7 +68,7 @@ class Lecturer(Mentor):
 
     def __str__(self):
         average_grade = self.calculate_average_grade()
-        return f"Имя: {self.name}\nФамилия: {self.surname}\nСредняя оценка: {average_grade}"
+        return f"Имя: {self.name}\nФамилия: {self.surname}\nСредняя оценка за лекции: {average_grade}"
 
 
 class Reviewer(Mentor):
@@ -67,9 +88,10 @@ class Reviewer(Mentor):
     def __str__(self):
         return f"Имя: {self.name}\nФамилия: {self.surname}"          
           
-# Пример использования
-best_student = Student('Ruoy', 'Eman', 'your_gender', 19)
-best_student.courses_in_progress += ['Python']
+
+best_student = Student('Ruoy', 'Eman', 'your_gender')
+best_student.courses_in_progress += ['Python', 'git']
+best_student.finished_courses += ['Введение в программирование']
 
 cool_reviewer = Reviewer('Саша', 'Бражник', ['Python'])
 
@@ -77,11 +99,15 @@ cool_reviewer.rate_hw(best_student, 'Python', 10)
 cool_reviewer.rate_hw(best_student, 'Python', 10)
 cool_reviewer.rate_hw(best_student, 'Python', 10)
 
-best_lecturer = Lecturer('John', 'Doe', ['Python'])
+best_lecturer = Lecturer('Роман', 'Нуар', ['Python', 'git'])
 best_lecturer.grades['Python'] = [9, 8, 7]
 
 
 print(best_lecturer.grades)
 print(best_student.grades)
+print('---Reviewer---')
 print(cool_reviewer)
+print('---Lecture---')
 print(best_lecturer)
+print('---student---')
+print(best_student)
